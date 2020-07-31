@@ -117,6 +117,80 @@ class GradesController {
       return res.json(error);
     }
   }
+
+  async sum(req, res) {
+    try {
+      const db = JSON.parse(
+        await readFile(resolve(__dirname, '..', 'datasets', 'grades.json'))
+      );
+
+      const { student, subject } = req.params;
+
+      const records = db.grades.filter(
+        (r) =>
+          r.student.toLowerCase() === student.toLowerCase() &&
+          r.subject.toLowerCase() === subject.toLowerCase()
+      );
+
+      let sum = 0;
+      records.forEach((r) => {
+        sum += r.value;
+      });
+
+      return res.json(sum);
+    } catch (error) {
+      return res.json(error);
+    }
+  }
+
+  async subjectTypeAverage(req, res) {
+    try {
+      const db = JSON.parse(
+        await readFile(resolve(__dirname, '..', 'datasets', 'grades.json'))
+      );
+
+      const { subject, type } = req.params;
+
+      const records = db.grades.filter(
+        (r) =>
+          r.subject.toLowerCase() === subject.toLowerCase() &&
+          r.type.toLowerCase() === type.toLowerCase()
+      );
+
+      let avg = 0;
+      records.forEach((r) => {
+        avg += r.value;
+      });
+
+      avg /= records.length;
+
+      return res.json(avg);
+    } catch (error) {
+      return res.json(error);
+    }
+  }
+
+  async top3(req, res) {
+    try {
+      const db = JSON.parse(
+        await readFile(resolve(__dirname, '..', 'datasets', 'grades.json'))
+      );
+
+      const { subject, type } = req.params;
+
+      const records = db.grades
+        .filter(
+          (r) =>
+            r.subject.toLowerCase() === subject.toLowerCase() &&
+            r.type.toLowerCase() === type.toLowerCase()
+        )
+        .sort((a, b) => b.value - a.value);
+
+      return res.json(records.slice(0, 3));
+    } catch (error) {
+      return res.json(error);
+    }
+  }
 }
 
 export default new GradesController();
